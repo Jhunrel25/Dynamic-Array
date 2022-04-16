@@ -79,24 +79,24 @@ public class Array<Type> implements
 
 
 	/**
-		Method that is used to insert an element at specified location in the array.
+		Method that is used to insert an element at specified position in the array.
 
 		@throws NoSuchElementException
 		@since Mar. 28, 2022
 		@since version: 1.0
 	*/
-	public void insert(int location, Type item) {
-		if (this.invalidIndex(location))
+	public void insert(int position, Type item) {
+		if (this.invalidIndex(position))
 			throw new NoSuchElementException();
 
 		Type[] newArray = (Type[]) new Object[ ++this.size ];
 
-		for (int index = 0; (index < location); ++index)
+		for (int index = 0; (index < position); ++index)
 			newArray[ index ] = this.array[ index ];
 
-		newArray[ location++ ] = item;
+		newArray[ position++ ] = item;
 
-		for (int index = location; (index < this.size); ++index)
+		for (int index = position; (index < this.size); ++index)
 			newArray[ index ] = this.array[ index - 1 ];
 
 		this.array = newArray;
@@ -227,7 +227,7 @@ public class Array<Type> implements
 	public void clear() {
 		if (this.size == 0) return;
 
-		this.array = (Type[]) new Object[(this.size = 0) + 3 ];
+		this.array = (Type[]) new Object[ 3 + (this.size = 0) ];
 	}
 
 
@@ -240,7 +240,7 @@ public class Array<Type> implements
 	*/
 	public int indexOf(Type item) {
 		for (int index = 0; (index < this.size); ++index)
-			if (item.equals(this.array[ index ]) || item == this.array[ index ])
+			if (item.equals(this.array[ index ]))
 				return index;
 
 		return -1;
@@ -280,7 +280,7 @@ public class Array<Type> implements
 	*/
 	@Override
 	public boolean equals(Object array) {
-		if (this.size() != ((Array)array).size())
+		if (this.size != ((Array)array).size())
 			return false;
 
 		for (int index = 0; (index < this.size); ++index)
