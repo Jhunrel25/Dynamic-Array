@@ -1,5 +1,4 @@
-package com.jhunrel_evangelista.github.array;
-
+package com.jhunrel_evangelista.github.dynamic_array;
 import java.util.NoSuchElementException;
 import java.util.Comparator;
 import java.util.Iterator;
