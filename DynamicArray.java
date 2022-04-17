@@ -1,8 +1,4 @@
-package com.jhunrel_evangelista.github.dynamic_array;
-import java.util.NoSuchElementException;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Arrays;
+import java.util.*;
 
 /**
 	A dynamic array that could grow and shrink automatically.
@@ -14,10 +10,24 @@ import java.util.Arrays;
 */
 public class Array<Type> implements
 
-	Iterator<Type>, Iterable<Type>, Comparable<Array> {
+	Iterator<Type>, Iterable<Type>, Comparable<Array<Type>> {
 
-	// private generic array and size field of type integer.
+	/**
+		Generic private array.
+
+		@since Mar. 28, 2022
+		@since version: 1.0
+	*/
 	private Type[] array;
+
+
+	/**
+		Integer variable that holds the current number of
+		elements in the array.
+
+		@since Mar. 28, 2022
+		@since version: 1.0
+	*/
 	private int size;
 
 
@@ -37,7 +47,7 @@ public class Array<Type> implements
 		@since version: 1.0
 	*/
 	public Array() {
-		this.array = (Type[]) new Object[ 3 ];
+		this.array = (Type[]) new Object[ 10 ];
 	}
 
 
@@ -66,7 +76,7 @@ public class Array<Type> implements
 	*/
 	public void add(Type item) {
 		if (this.size == this.array.length) {
-			Type[] newArray = (Type[]) new Object[ this.size + 1 ];
+			Type[] newArray = (Type[]) new Object[ this.size * 2 ];
 
 			for (int index = 0; (index < this.size); ++index)
 				newArray[ index ] = this.array[ index ];
@@ -80,13 +90,17 @@ public class Array<Type> implements
 	/**
 		Method that is used to insert an element at specified position in the array.
 
+		@throws IndexOutOfBoundsException
 		@throws NoSuchElementException
 		@since Mar. 28, 2022
 		@since version: 1.0
 	*/
 	public void insert(int position, Type item) {
-		if (this.invalidIndex(position))
+		if (this.size == 0)
 			throw new NoSuchElementException();
+
+		if (this.invalidIndex(position))
+			throw new IndexOutOfBoundsException();
 
 		Type[] newArray = (Type[]) new Object[ ++this.size ];
 
@@ -105,11 +119,16 @@ public class Array<Type> implements
 	/**
 		Method that is used to copy all the elements from another Array passed as the parameter.
 
+		@throws IllegalArgumentException
 		@since Mar. 29, 2022
 		@since version: 1.1
 	*/
 	public void merge(Array<Type> array) {
-		if (array.size() == 0) return;
+		if (array.size() == 0)
+			return;
+
+		if (this.equals(array))
+			throw new IllegalArgumentException();
 
 		for (int index = 0; (index < array.size()); ++index)
 			this.add(array.get(index));
@@ -119,13 +138,17 @@ public class Array<Type> implements
 	/**
 		Method that is used to replace an element at specified index in the array.
 
+		@throws IndexOutOfBoundsException
 		@throws NoSuchElementException
 		@since Mar. 28, 2022
 		@since version: 1.0
 	*/
 	public void replace(int index, Type item) {
-		if (this.invalidIndex(index))
+		if (this.size == 0)
 			throw new NoSuchElementException();
+
+		if (this.invalidIndex(index))
+			throw new IndexOutOfBoundsException();
 
 		this.array[ index ] = item;
 	}
@@ -135,13 +158,17 @@ public class Array<Type> implements
 		Method that is used to retrieve an element at specified index in the array.
 
 		@return Type
+		@throws IndexOutOfBoundsException
 		@throws NoSuchElementException
 		@since Mar. 28, 2022
 		@since version: 1.0
 	*/
 	public Type get(int index) {
-		if (this.invalidIndex(index))
+		if (this.size == 0)
 			throw new NoSuchElementException();
+
+		if (this.invalidIndex(index))
+			throw new IndexOutOfBoundsException();
 
 		return this.array[ index ];
 	}
@@ -156,7 +183,7 @@ public class Array<Type> implements
 		@since version: 1.1
 	*/
 	public Type getFirstElement() {
-		if (this.size < 1)
+		if (this.size == 0)
 			throw new NoSuchElementException();
 
 		return this.array[ 0 ];
@@ -172,7 +199,7 @@ public class Array<Type> implements
 		@since version: 1.1
 	*/
 	public Type getLastElement() {
-		if (this.size < 1)
+		if (this.size == 0)
 			throw new NoSuchElementException();
 
 		return this.array[ this.size - 1 ];
@@ -182,11 +209,17 @@ public class Array<Type> implements
 	/**
 		Method that is used to delete an element at specified index in the array.
 
+		@throws IndexOutOfBoundsException
+		@throws NoSuchElementException
 		@since Mar. 28, 2022
 		@since version: 1.0
 	*/
 	public void remove(int target) {
-		if (this.invalidIndex(target)) return;
+		if (this.size == 0)
+			throw new NoSuchElementException();
+
+		if (this.invalidIndex(target))
+			throw new IndexOutOfBoundsException();
 
 		for (int index = target; (index < this.size - 1); ++index)
 			this.array[ index ] = this.array[ index + 1 ];
@@ -196,12 +229,44 @@ public class Array<Type> implements
 
 
 	/**
+		Method that is used to delete all the elements within the specified range in the array.
+
+		@throws IndexOutOfBoundsException
+		@throws NoSuchElementException
+		@since Mar. 28, 2022
+		@since version: 1.0
+	*/
+	public void removeAll(int start, int end) {
+		if (this.size == 0)
+			throw new NoSuchElementException();
+
+		if (this.invalidIndex(start) || this.invalidIndex(end))
+			throw new IndexOutOfBoundsException();
+
+		Type[] newArray = (Type[]) new Object[ this.size - (end - start) ];
+
+		int size = 0;
+
+		for (int index = 0; (index < this.size); ++index)
+			if (!(index >= start && index <= end))
+				newArray[ size++ ] = this.array[ index ];
+
+		this.array = newArray;
+		this.size = size;
+	}
+
+
+	/**
 		Method that is used to delete the first element in the array.
 
+		@throws NoSuchElementException
 		@since Mar. 29, 2022
 		@since version: 1.1
 	*/
 	public void removeFirstElement() {
+		if (this.size == 0)
+			throw new NoSuchElementException();
+
 		this.remove(0);
 	}
 
@@ -209,10 +274,14 @@ public class Array<Type> implements
 	/**
 		Method that is used to delete the last element in the array.
 
+		@throws NoSuchElementException
 		@since Mar. 29, 2022
 		@since version: 1.1
 	*/
 	public void removeLastElement() {
+		if (this.size == 0)
+			throw new NoSuchElementException();
+
 		this.remove(this.size - 1);
 	}
 
@@ -220,13 +289,15 @@ public class Array<Type> implements
 	/**
 		Method that is used to delete all the elements in the array.
 
+		@throws NoSuchElementException
 		@since Mar. 28, 2022
 		@since version: 1.0
 	*/
 	public void clear() {
-		if (this.size == 0) return;
+		if (this.size == 0)
+			throw new NoSuchElementException();
 
-		this.array = (Type[]) new Object[ 3 + (this.size = 0) ];
+		this.array = (Type[]) new Object[ 10 + (this.size = 0) ];
 	}
 
 
@@ -238,6 +309,9 @@ public class Array<Type> implements
 		@since version: 1.0
 	*/
 	public int indexOf(Type item) {
+		if (this.size == 0)
+			return -1;
+
 		for (int index = 0; (index < this.size); ++index)
 			if (item.equals(this.array[ index ]))
 				return index;
@@ -254,6 +328,9 @@ public class Array<Type> implements
 		@since version: 1.0
 	*/
 	public boolean contains(Type item) {
+		if (this.size == 0)
+			return false;
+
 		return this.indexOf(item) > -1;
 	}
 
@@ -328,7 +405,15 @@ public class Array<Type> implements
 		@since version: 1.0
 	*/
 	public void sort() {
-		Arrays.sort(this.array, (Comparator<? super Type>)Comparator.naturalOrder());
+		if (this.size < 2)
+			return;
+
+		Object[] objectArray = this.array;
+
+		QuickSort sort = new QuickSort();
+		sort.ascendingOrder(objectArray, this.size);
+
+		this.array = (Type[]) objectArray;
 	}
 
 
@@ -361,7 +446,15 @@ public class Array<Type> implements
 		@since version: 1.0
 	*/
 	public void reversed() {
-		Arrays.sort(this.array, (Comparator<? super Type>)Comparator.reverseOrder());
+		if (this.size < 2)
+			return;
+
+		Object[] objectArray = this.array;
+
+		QuickSort sort = new QuickSort();
+		sort.descendingOrder(objectArray, this.size);
+
+		this.array = (Type[]) objectArray;
 	}
 
 
@@ -432,6 +525,9 @@ public class Array<Type> implements
 	*/
 	@Override
 	public String toString() {
+		if (this.size == 0)
+			return null;
+
 		StringBuilder stringRepresentation = new StringBuilder("{\n");
 
 		for (int index = 0; (index < this.size); ++index) {
@@ -462,6 +558,9 @@ public class Array<Type> implements
 		@since version: 1.2
 	*/
 	public void toSet() {
+		if (this.size == 0)
+			return;
+
 		Type[] newArray = (Type[]) new Object[ this.size ];
 
 		this.ascendingOrder();
@@ -474,10 +573,8 @@ public class Array<Type> implements
 			if (! newArray[ size - 1 ].equals(this.array[ index ]))
 				newArray[ size++ ] = this.array[ index ];
 		}
-		this.array = (Type[]) new Object[ this.size = size ];
-
-		for (int index = 0; (index < size); ++index)
-			this.array[ index ] = newArray[ index ];
+		this.array = newArray;
+		this.size = size;
 	}
 
 
@@ -492,7 +589,12 @@ public class Array<Type> implements
 	public Iterator<Type> iterator() {
 		Iterator<Type> iterator = new Iterator<>() {
 
-			// private variable that has a default value of zero.
+			/**
+			Integer variable that is used to access elements in the array.
+
+			@since Mar. 28, 2022
+			@since version: 1.0
+			*/
 			private int index = 0;
 
 
@@ -549,5 +651,60 @@ public class Array<Type> implements
 	@Override
 	public Type next() {
 		return this.iterator().next();
+	}
+
+
+	private static class QuickSort {
+
+		private boolean descendingOrder = false;
+
+		private int partition(Object[] array, int minIndex, int maxIndex) {
+			Object pivot = array[ maxIndex ];
+			int middle = (minIndex - 1);
+
+			if (this.descendingOrder) {
+				for (int i = minIndex; (i < maxIndex); ++i)
+					if (((Comparable)array[ i ]).compareTo(pivot) > 0) {
+
+						Object temp = array[ ++middle ];
+						array[ middle ] = array[ i ];
+						array[ i ] = temp;
+					}
+			} else {
+				for (int i = minIndex; (i < maxIndex); ++i)
+					if (((Comparable)array[ i ]).compareTo(pivot) < 0) {
+
+						Object temp = array[ ++middle ];
+						array[ middle ] = array[ i ];
+						array[ i ] = temp;
+					}
+			}
+			Object temp = array[ ++middle ];
+			array[ middle ] = array[ maxIndex ];
+			array[ maxIndex ] = temp;
+
+			return middle;
+		}
+
+
+		private void quickSort(Object[] array, int minIndex, int maxIndex) {
+			if (minIndex < maxIndex) {
+				int partition = partition(array, minIndex, maxIndex);
+				quickSort(array, minIndex, (partition - 1));
+				quickSort(array, (partition + 1), maxIndex);
+			}
+		}
+
+
+		public void ascendingOrder(Object[] array, int size) {
+			this.descendingOrder = false;
+			quickSort(array, 0, (size - 1));
+		}
+
+
+		public void descendingOrder(Object[] array, int size) {
+			this.descendingOrder = true;
+			quickSort(array, 0, (size - 1));
+		}
 	}
 }
