@@ -558,7 +558,7 @@ public class Array<Type> implements
 		@since version: 1.2
 	*/
 	public void toSet() {
-		if (this.size == 0)
+		if (this.size < 2)
 			return;
 
 		Type[] newArray = (Type[]) new Object[ this.size ];
