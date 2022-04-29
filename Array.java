@@ -1,5 +1,6 @@
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class Array<Type> implements
 
@@ -37,6 +38,14 @@ public class Array<Type> implements
 
 
 	public void addAll(Array<Type> array) {
+		if (this.nulls() < array.size()) {
+			Type[] newArray = (Type[]) new Object[ array.size() + (this.size * 2) ];
+
+			for (int i = 0; (i < this.size); ++i)
+				newArray[ i ] = this.array[ i ];
+
+			this.array = newArray;
+		}
 		for (int i = 0; (i < array.size()); ++i)
 			this.add(array.get(i));
 	}
@@ -84,7 +93,7 @@ public class Array<Type> implements
 
 
 	public void replaceAll(Type currentElement, Type newElement) {
-		while (!(this.indexOf(currentElement) < 0))
+		while (this.contains(currentElement))
 			this.replace(this.indexOf(currentElement), newElement);
 	}
 
@@ -100,7 +109,7 @@ public class Array<Type> implements
 
 
 	public void removeAll(Type element) {
-		while (!(this.indexOf(element) < 0))
+		while (this.contains(element))
 			this.remove(this.indexOf(element));
 	}
 
@@ -142,7 +151,7 @@ public class Array<Type> implements
 
 	public int indexOf(Type element) {
 		for (int i = 0; (i < this.size); ++i)
-			if (element.equals(this.get(i)))
+			if (element.equals(this.array[ i ]))
 				return i;
 
 		return -1;
@@ -151,6 +160,26 @@ public class Array<Type> implements
 
 	public boolean contains(Type element) {
 		return !(this.indexOf(element) < 0);
+	}
+
+
+	public boolean containsAll(Array<Type> array) {
+		if (array == this)
+			return true;
+
+		if (array == null || this == null)
+			return false;
+
+		var each = new HashSet<Type>();
+
+		for (Type e : this)
+			each.add(e);
+
+		for (Type e : array)
+			if (!(each.contains(e)))
+				return false;
+
+		return true;
 	}
 
 
@@ -173,30 +202,23 @@ public class Array<Type> implements
 		if (!(((Array<Type>)o).size() == this.size))
 			return false;
 
-		class CountTrack {
-			public int count = 1;
-		}
+		var counter = new HashMap<Type, Integer>();
 
-		HashMap<Type, CountTrack> counter = new HashMap<>();
-
-		for (Type e : this) {
-			final CountTrack count = counter.get(e);
-
-			if (count != null)
-				count.count++;
+		for (Type e : this)
+			if (counter.get(e) != null)
+				counter.replace(e, (counter.get(e) + 1));
 
 			else
-				counter.put(e, new CountTrack());
-		}
+				counter.put(e, 1);
 
-		for (Type e : ((Array<Type>)o)) {
-			final CountTrack count = counter.get(e);
 
-			if (count == null || count.count == 0)
+		for (Type e : ((Array<Type>)o))
+			if (counter.get(e) != null && counter.get(e) > 0)
+				counter.replace(e, (counter.get(e) - 1));
+
+			else
 				return false;
 
-			count.count--;
-		}
 		return true;
 	}
 
@@ -215,22 +237,22 @@ public class Array<Type> implements
 
 	@Override
 	public String toString() {
-		StringBuilder string = new StringBuilder("[ ");
+		var string = new StringBuilder("[ ");
 
-		for (int i = 0; (i < this.size); ++i) {
+		for (int i = 0; (i < this.size); ++i)
 			if (i == (this.size - 1))
-				string.append(this.get(i)).append(" ]");
+				string.append(this.array[ i ]).append(" ]");
 
 			else
-				string.append(this.get(i)).append(", ");
-		}
+				string.append(this.array[ i ]).append(", ");
+
 		return (string.length() < 3) ? "[]" : string.toString();
 	}
 
 
 	@Override
 	public Iterator<Type> iterator() {
-		Iterator<Type> iterator = new Iterator() {
+		var iterator = new Iterator<Type>() {
 			private int index = 0;
 
 			@Override
@@ -317,4 +339,46 @@ public class Array<Type> implements
 	public int size() {
 		return this.size;
 	}
+
+
+	public Array<Type> clone() {
+		return this;
+	}
+
+
+	public Array<Type> subArray(int from, int to) {
+		var array = new Array<Type>(++to - from);
+
+		for (int i = from; (i < to); ++i)
+			array.add(this.array[ i ]);
+
+		return array;
+	}
+
+
+	public Array<Type> subArray(int from) {
+		var array = new Array<Type>((this.size - from));
+
+		for (int i = from; (i < this.size); ++i)
+			array.add(this.array[ i ]);
+
+		return array;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
