@@ -1,6 +1,7 @@
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Arrays;
 
 public class Array<Type> implements
 
@@ -25,6 +26,9 @@ public class Array<Type> implements
 
 
 	public void add(Type element) {
+		if (element == null)
+			return;
+
 		if (this.size == this.array.length) {
 			Type[] newArray = (Type[]) new Object[ this.size * 2 ];
 
@@ -38,6 +42,9 @@ public class Array<Type> implements
 
 
 	public void addAll(Array<Type> array) {
+		if (array == null)
+			return;
+
 		if (this.nulls() < array.size()) {
 			Type[] newArray = (Type[]) new Object[ array.size() + (this.size * 2) ];
 
@@ -52,6 +59,9 @@ public class Array<Type> implements
 
 
 	public void insert(int index, Type element) {
+		if (element == null)
+			return;
+
 		if (this.validIndex(index)) {
 			Type[] newArray = (Type[]) new Object[ ++this.size ];
 
@@ -69,6 +79,9 @@ public class Array<Type> implements
 
 
 	public void insertAll(int index, Array<Type> array) {
+		if (array == null)
+			return;
+
 		if (this.validIndex(index)) {
 			Type[] newArray = (Type[]) new Object[ this.size += array.size() ];
 
@@ -87,6 +100,9 @@ public class Array<Type> implements
 
 
 	public void replace(int index, Type element) {
+		if (element == null)
+			return;
+
 		if (this.validIndex(index))
 			this.array[ index ] = element;
 	}
@@ -95,6 +111,18 @@ public class Array<Type> implements
 	public void replaceAll(Type currentElement, Type newElement) {
 		while (this.contains(currentElement))
 			this.replace(this.indexOf(currentElement), newElement);
+	}
+
+
+	public void replaceIf(int index, Type element, boolean condition) {
+		if (condition)
+			this.replace(index, element);
+	}
+
+
+	public void replaceAllIf(Type currentElement, Type newElement, boolean condition) {
+		if (condition)
+			this.replaceAll(currentElement, newElement);
 	}
 
 
@@ -114,8 +142,26 @@ public class Array<Type> implements
 	}
 
 
+	public void removeIf(int index, boolean condition) {
+		if (condition)
+			this.remove(index);
+	}
+
+
+	public void removeAllIf(Type element, boolean condition) {
+		if (condition)
+			this.removeAll(element);
+	}
+
+
 	public void clear() {
-		this.array = (Type[]) new Object[ 10 ];
+		this.array = (Type[]) new Object[ 10 + (this.size = 0) ];
+	}
+
+
+	public void clearIf(boolean condition) {
+		if (condition)
+			this.clear();
 	}
 
 
@@ -124,6 +170,16 @@ public class Array<Type> implements
 			return this.array[ index ];
 
 		return null;
+	}
+
+
+	public Type getFirstElement() {
+		return this.get(0);
+	}
+
+
+	public Type getLastElement() {
+		return this.get((this.size - 1));
 	}
 
 
@@ -150,6 +206,9 @@ public class Array<Type> implements
 
 
 	public int indexOf(Type element) {
+		if (element == null)
+			return -1;
+
 		for (int i = 0; (i < this.size); ++i)
 			if (element.equals(this.array[ i ]))
 				return i;
@@ -167,7 +226,7 @@ public class Array<Type> implements
 		if (array == this)
 			return true;
 
-		if (array == null || this == null)
+		if (array == null)
 			return false;
 
 		var each = new HashSet<Type>();
@@ -193,7 +252,7 @@ public class Array<Type> implements
 		if (o == this)
 			return true;
 
-		if (o == null || this == null)
+		if (o == null)
 			return false;
 
 		if (!(((Array<Type>)o) instanceof Array<?>))
@@ -220,6 +279,17 @@ public class Array<Type> implements
 				return false;
 
 		return true;
+	}
+
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+
+		hash = 31 * hash + Integer.hashCode(this.size);
+		hash = 47 * hash + Arrays.deepHashCode(this.array);
+
+		return hash;
 	}
 
 
@@ -350,7 +420,7 @@ public class Array<Type> implements
 		var array = new Array<Type>(++to - from);
 
 		for (int i = from; (i < to); ++i)
-			array.add(this.array[ i ]);
+			array.add(this.get(i));
 
 		return array;
 	}
@@ -360,25 +430,8 @@ public class Array<Type> implements
 		var array = new Array<Type>((this.size - from));
 
 		for (int i = from; (i < this.size); ++i)
-			array.add(this.array[ i ]);
+			array.add(this.get(i));
 
 		return array;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
