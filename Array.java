@@ -1,3 +1,4 @@
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +14,20 @@ public class Array<Type> implements
 
 	public Array(int capacity) {
 		this.array = (Type[]) new Object[ capacity ];
+	}
+
+	public Array(Type[] array) {
+		this.array = (Type[]) new Object[ array.length ];
+
+		for (Type e : array)
+			this.add(e);
+	}
+
+	public Array(Collection<Type> array) {
+		this.array = (Type[]) new Object[ array.size() ];
+
+		for (Type e : array)
+			this.add(e);
 	}
 
 	public Array() {
